@@ -42,25 +42,24 @@ pushd ${DIR} > /dev/null
         ## run codeface analysis with current tagging set
         codeface -j 11 -l "devinfo" run --recreate -c ${CFCONF} -p ${CSCONF} ${RESULTS} ${REPOS} > ${LOGS}/codeface_run.log 2>&1
 
-        ## run mailing-list analysis (attached to feature/proximity analysis!)
-        codeface -j 11 -l "devinfo" ml -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
+        # ## run mailing-list analysis (attached to feature/proximity analysis!)
+        # codeface -j 11 -l "devinfo" ml -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
         # codeface -j 11 -l "devinfo" ml --use-corpus -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
 
         ## run conway analysis (do NOT give -j paramater, it may break the analysis!)
         codeface -l "devinfo" conway -c ${CFCONF} -p ${CSCONF} "${RESULTS}" ${REPOS} ${TITAN} > ${LOGS}/codeface_conway.log 2>&1
 
-        ## run GitHubWrapper extraction
-        java -Xmx100G -jar "${CFGHW}" \
-            -dump "${RESULTS}/${CASESTUDY}_issues/issues.json" \
-            -tokens "${CFDATA}/configurations/tokens.txt" \
-            -repo "${REPOS}/${CASESTUDY}/" \
-            -workDir "${REPOS}/" > ${LOGS}/codeface_githubwrapper.log 2>&1
-
+        # ## run GitHubWrapper extraction
+        # java -Xmx100G -jar "${CFGHW}" \
+        #     -dump "${RESULTS}/${CASESTUDY}_issues/issues.json" \
+        #     -tokens "${CFDATA}/configurations/tokens.txt" \
+        #     -repo "${REPOS}/${CASESTUDY}/" \
+        #     -workDir "${REPOS}/" > ${LOGS}/codeface_githubwrapper.log 2>&1
 
         ## run extraction process for this configuration
         pushd "${CFEXTRACT}" > /dev/null
-            ISSUEPROCESS="${CFEXTRACT}/run-issues.py"
-            python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues.log 2>&1
+            # ISSUEPROCESS="${CFEXTRACT}/run-issues.py"
+            # python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues.log 2>&1
 
             ISSUEPROCESS="${CFEXTRACT}/run-jira-issues.py"
             python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues_jira.log 2>&1
@@ -71,17 +70,17 @@ pushd ${DIR} > /dev/null
             # add parameter '--implementation' to extract function implementations
             # add parameter '--commit-messages' to extract commit messages
 
-            MBOXPARSING="${CFEXTRACT}/run-parsing.py"
-            ## Remove already existing log file to be able to append later
-            rm ${LOGS}/codeface_mbox_parsing.log
-            ## MboxParsing without filepath
-            python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
-            ## MboxParsing with filepath
-            python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} -f ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
-            ## MboxParsing file (base name only)
-            python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} --file ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
-            ## MboxParsing file with filepath
-            python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} --file -f ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
+            # MBOXPARSING="${CFEXTRACT}/run-parsing.py"
+            # ## Remove already existing log file to be able to append later
+            # rm ${LOGS}/codeface_mbox_parsing.log
+            # ## MboxParsing without filepath
+            # python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
+            # ## MboxParsing with filepath
+            # python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} -f ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
+            # ## MboxParsing file (base name only)
+            # python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} --file ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
+            # ## MboxParsing file with filepath
+            # python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} --file -f ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
         popd
 
         ## stop ID service
