@@ -33,12 +33,12 @@ pushd ${DIR} > /dev/null
 
     pushd $CFDIR
 
-        # ## start ID service
-        # pushd "id_service"
-        #     echo "### " $(date "+%F %T") "Starting ID service" 2>&1 > "${LOGS}/id_service.log"
-        #     nodejs id_service.js ${CFCONF} "info" 2>&1 >> "${LOGS}/id_service.log" &
-        #     IDSERVICE=$!
-        # popd
+        ## start ID service
+        pushd "id_service"
+            echo "### " $(date "+%F %T") "Starting ID service" 2>&1 > "${LOGS}/id_service.log"
+            nodejs id_service.js ${CFCONF} "info" 2>&1 >> "${LOGS}/id_service.log" &
+            IDSERVICE=$!
+        popd
 
         # ## set stack size large enough to prevent C stack overflow errors
         # ulimit -s 512000
@@ -47,7 +47,7 @@ pushd ${DIR} > /dev/null
 
         # ## run mailing-list analysis (attached to feature/proximity analysis!)
         # codeface -j 11 -l "devinfo" ml -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
-        # # codeface -j 11 -l "devinfo" ml --use-corpus -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
+        # #codeface -j 11 -l "devinfo" ml --use-corpus -c ${CFCONF} -p ${CSCONF} "${RESULTS}" "${MAILINGLISTS}" > ${LOGS}/codeface_ml.log 2>&1
 
         # ## run conway analysis (do NOT give -j paramater, it may break the analysis!)
         # unset DISPLAY
@@ -56,37 +56,37 @@ pushd ${DIR} > /dev/null
         # ## run GitHubWrapper extraction
         # mkdir -p "${RESULTS}/${CASESTUDY}_issues/"
         # java -Xmx250G -Xss1G -jar "${CFGHW}" \
-        #    -dump "${RESULTS}/${CASESTUDY}_issues/issues.json" \
-        #    -tokens "${CFDATA}/configurations/tokens.txt" \
-        #    -repo "${REPOS}/${CASESTUDY}/" \
-        #    -workDir "${REPOS}/" > ${LOGS}/codeface_githubwrapper.log 2>&1
+        #     -dump "${RESULTS}/${CASESTUDY}_issues/issues.json" \
+        #     -tokens "${CFDATA}/configurations/tokens.txt" \
+        #     -repo "${REPOS}/${CASESTUDY}/" \
+        #     -workDir "${REPOS}/" > ${LOGS}/codeface_githubwrapper.log 2>&1
 
-        # ## run BoDeGHa to identify bots on GitHub
-        # source "${BODEGHA}/bin/activate"
-        # pushd "${REPOS}/${CASESTUDY}/" > /dev/null
-        #     URL=$(git remote get-url origin)
-        #     URL_WITHOUT_SUFFIX=${URL%.*}
-        #     REPO_NAME=$(basename ${URL%.*})
-        #     REPO_ORGANIZATION=$(basename "${URL_WITHOUT_SUFFIX%/${REPO_NAME}}")
-        # popd
-        # TOKEN=$(tail -n 1 "${CFDATA}/configurations/tokens.txt")
-        # # TODO: start date?
-        # BODEGHA_COMMAND="bodegha ${REPO_ORGANIZATION}/${REPO_NAME} --verbose --key ${TOKEN} --csv --start-date 01-01-2009 --max-comments 2000"
-        # BODEGHA_LOG="${LOGS}/codeface_bodegha.log"
-        # echo ${BODEGHA_COMMAND} > ${BODEGHA_LOG}
-        # ${BODEGHA_COMMAND} 2>> ${BODEGHA_LOG} 1> "${RESULTS}/${CASESTUDY}_issues/bots.csv"
-        # deactivate
+        ## run BoDeGHa to identify bots on GitHub
+        source "${BODEGHA}/bin/activate"
+        pushd "${REPOS}/${CASESTUDY}/" > /dev/null
+            URL=$(git remote get-url origin)
+            URL_WITHOUT_SUFFIX=${URL%.*}
+            REPO_NAME=$(basename ${URL%.*})
+            REPO_ORGANIZATION=$(basename "${URL_WITHOUT_SUFFIX%/${REPO_NAME}}")
+        popd
+        TOKEN=$(tail -n 1 "${CFDATA}/configurations/tokens.txt")
+        # TODO: start date?
+        BODEGHA_COMMAND="bodegha ${REPO_ORGANIZATION}/${REPO_NAME} --verbose --key ${TOKEN} --csv --start-date 01-01-2009 --max-comments 2000"
+        BODEGHA_LOG="${LOGS}/codeface_bodegha.log"
+        echo ${BODEGHA_COMMAND} > ${BODEGHA_LOG}
+        ${BODEGHA_COMMAND} 2>> ${BODEGHA_LOG} 1> "${RESULTS}/${CASESTUDY}_issues/bots.csv"
+        deactivate
 
         ## run extraction process for this configuration
         pushd "${CFEXTRACT}" > /dev/null
-            # ISSUEPROCESS="${CFEXTRACT}/run-issues.py"
-            # python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues.log 2>&1
+            ISSUEPROCESS="${CFEXTRACT}/run-issues.py"
+            python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues.log 2>&1
 
             # ISSUEPROCESS="${CFEXTRACT}/run-jira-issues.py"
             # python ${ISSUEPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_issues_jira.log 2>&1
 
-            # BOTSPROCESS="${CFEXTRACT}/run-bots.py"
-            # python ${BOTSPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_bots.log 2>&1
+            BOTSPROCESS="${CFEXTRACT}/run-bots.py"
+            python ${BOTSPROCESS} -c ${CFCONF} -p ${CSCONF} ${RESULTS} > ${LOGS}/codeface_bots.log 2>&1
 
             EXTRACTION="${CFEXTRACT}/run-extraction.py"
             ## Remove already existing backup folder (to be able to create a new backup in the author postprocessing step
@@ -113,8 +113,8 @@ pushd ${DIR} > /dev/null
             # python ${MBOXPARSING} -c ${CFCONF} -p ${CSCONF} --file -f ${RESULTS} ${MAILINGLISTS} >> ${LOGS}/codeface_mbox_parsing.log 2>&1
         popd
 
-        # ## stop ID service
-        # kill $IDSERVICE
+        ## stop ID service
+        kill $IDSERVICE
 
     popd
 
